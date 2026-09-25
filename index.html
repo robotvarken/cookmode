@@ -2,9 +2,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#111111" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#111111">
   <title>Cook Mode</title>
 
   <style>
@@ -12,174 +12,101 @@
       box-sizing: border-box;
     }
 
-    html,
-    body {
+    html, body {
       margin: 0;
       width: 100%;
       height: 100%;
       background: #111;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: white;
     }
 
     body {
       display: flex;
       align-items: center;
       justify-content: center;
-      color: white;
-      user-select: none;
     }
 
     .container {
       text-align: center;
-      padding: 24px;
     }
 
-    button {
-      width: min(80vw, 360px);
-      height: min(80vw, 360px);
-      max-height: 50vh;
-      max-width: 50vh;
+    h1 {
+      font-size: 32px;
+      margin-bottom: 35px;
+    }
 
-      border: none;
-      border-radius: 50%;
+    /* Toggle */
 
-      background: #fff;
-      color: #111;
+    .toggle {
+      position: relative;
+      display: inline-block;
+      width: 100px;
+      height: 56px;
+    }
 
-      font-size: clamp(24px, 7vw, 42px);
-      font-weight: 700;
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
 
+    .slider {
+      position: absolute;
+      inset: 0;
+      background: #444;
+      border-radius: 56px;
       cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
-
-      transition:
-        transform 0.15s ease,
-        background 0.2s ease,
-        color 0.2s ease;
+      transition: 0.25s;
     }
 
-    button:active {
-      transform: scale(0.94);
+    .slider::before {
+      content: "";
+      position: absolute;
+      width: 44px;
+      height: 44px;
+      left: 6px;
+      top: 6px;
+      background: white;
+      border-radius: 50%;
+      transition: 0.25s;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
     }
 
-    button.active {
+    input:checked + .slider {
       background: #39d98a;
-      color: #062b1a;
+    }
+
+    input:checked + .slider::before {
+      transform: translateX(44px);
     }
 
     .status {
-      margin-top: 28px;
-      font-size: 18px;
-      color: #aaa;
-    }
-
-    .status strong {
-      color: white;
+      margin-top: 25px;
+      font-size: 20px;
+      font-weight: 600;
     }
 
     .hint {
       margin-top: 10px;
+      color: #777;
       font-size: 14px;
-      color: #666;
-    }
-
-    .unsupported {
-      color: #ffb4b4;
     }
   </style>
 </head>
 
 <body>
-  <main class="container">
-    <button id="cookButton" type="button" aria-pressed="false">
-      Cook Mode
-    </button>
 
-    <div class="status" id="status">
-      <strong>OFF</strong>
-    </div>
+  <main class="container">
+
+    <h1>Cook Mode</h1>
+
+    <label class="toggle">
+      <input type="checkbox" id="cookToggle">
+      <span class="slider"></span>
+    </label>
+
+    <div class="status" id="status">OFF</div>
 
     <div class="hint" id="hint">
-      Tap the button to keep your screen awake
-    </div>
-  </main>
-
-  <script>
-    const button = document.getElementById("cookButton");
-    const status = document.getElementById("status");
-    const hint = document.getElementById("hint");
-
-    let wakeLock = null;
-
-    async function enableCookMode() {
-      if (!("wakeLock" in navigator)) {
-        status.innerHTML = '<strong>Not supported</strong>';
-        hint.textContent =
-          "Your browser doesn't support keeping the screen awake.";
-        hint.classList.add("unsupported");
-        return;
-      }
-
-      try {
-        wakeLock = await navigator.wakeLock.request("screen");
-
-        button.classList.add("active");
-        button.setAttribute("aria-pressed", "true");
-        button.textContent = "Cook Mode ON";
-
-        status.innerHTML = "<strong>ON</strong>";
-        hint.textContent = "Your screen will stay awake";
-
-        // The wake lock can be released automatically when the page
-        // becomes hidden. Re-acquire it when the user comes back.
-        wakeLock.addEventListener("release", () => {
-          wakeLock = null;
-        });
-
-      } catch (error) {
-        console.error("Wake Lock failed:", error);
-
-        status.innerHTML = "<strong>Couldn't activate</strong>";
-        hint.textContent =
-          "Try again, or make sure you're using HTTPS.";
-      }
-    }
-
-    async function disableCookMode() {
-      if (wakeLock) {
-        await wakeLock.release();
-        wakeLock = null;
-      }
-
-      button.classList.remove("active");
-      button.setAttribute("aria-pressed", "false");
-      button.textContent = "Cook Mode";
-
-      status.innerHTML = "<strong>OFF</strong>";
-      hint.textContent = "Tap the button to keep your screen awake";
-    }
-
-    button.addEventListener("click", async () => {
-      if (wakeLock) {
-        await disableCookMode();
-      } else {
-        await enableCookMode();
-      }
-    });
-
-    // Mobile browsers may release the wake lock when the tab becomes
-    // hidden. Re-acquire it when the user returns to the page.
-    document.addEventListener("visibilitychange", async () => {
-      if (
-        document.visibilityState === "visible" &&
-        button.classList.contains("active")
-      ) {
-        await enableCookMode();
-      }
-    });
-  </script>
-</body>
-</html>
 ```
