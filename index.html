@@ -28,13 +28,18 @@
     }
 
     .container {
+      width: 100%;
+      max-width: 500px;
       text-align: center;
+      padding: 30px;
     }
 
     h1 {
       font-size: 32px;
       margin: 0 0 35px;
     }
+
+    /* Toggle */
 
     .toggle {
       position: relative;
@@ -90,6 +95,28 @@
       color: #777777;
       font-size: 14px;
     }
+
+    /* User Agent */
+
+    .user-agent {
+      margin-top: 45px;
+      padding-top: 20px;
+      border-top: 1px solid #2d2d2d;
+      text-align: left;
+    }
+
+    .user-agent-title {
+      color: #888888;
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+
+    .user-agent-value {
+      color: #aaaaaa;
+      font-size: 11px;
+      line-height: 1.5;
+      word-break: break-word;
+    }
   </style>
 </head>
 
@@ -110,6 +137,11 @@
       Keep your screen awake while cooking
     </div>
 
+    <div class="user-agent">
+      <div class="user-agent-title">User Agent</div>
+      <div class="user-agent-value" id="userAgent"></div>
+    </div>
+
   </main>
 
   <script>
@@ -122,7 +154,8 @@
     async function enableCookMode() {
       if (!("wakeLock" in navigator)) {
         status.textContent = "Not supported";
-        hint.textContent = "Your browser doesn't support screen wake lock.";
+        hint.textContent =
+          "Your browser doesn't support screen wake lock.";
         toggle.checked = false;
         return;
       }
@@ -153,7 +186,8 @@
       }
 
       status.textContent = "OFF";
-      hint.textContent = "Keep your screen awake while cooking";
+      hint.textContent =
+        "Keep your screen awake while cooking";
     }
 
     toggle.addEventListener("change", async () => {
@@ -172,6 +206,10 @@
         await enableCookMode();
       }
     });
+
+    // Display the browser's exact User Agent
+    document.getElementById("userAgent").textContent =
+      navigator.userAgent;
   </script>
 
 </body>
